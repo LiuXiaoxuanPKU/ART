@@ -35,23 +35,23 @@ void testN4(){
 void testN48(){
     uint8_t rootprefix[2] = {200,201};
     N48 root(rootprefix,2);
-    N48* children[50];
+    N* c[50];
     for(int i=0;i<48;i++){
-        children[i] = new N48({},0);
-        root.insert(i, children[i]);
+        c[i] = new N48({},0);
+        root.insert(i, c[i]);
     }
-    children[48] = new N48({},0);
-    children[49] = new N48({},0);
-    assert(root.insert(48, children[48])==false);
+    c[48] = new N48({},0);
+    c[49] = new N48({},0);
+    assert(root.insert(48, c[48])==false);
     assert(root.remove(1)==true);
     assert(root.getChild(1)==nullptr);
-    assert(root.getChild(2)==children[2]);
+    assert(root.getChild(2)==c[2]);
     for(int i=0;i<50;i++)
-        delete children[i];
+        delete c[i];
 }
 
 void testN256(){
-    
+
 }
 
 void testN(){
@@ -60,7 +60,7 @@ void testN(){
     N4* children[50];
     for(int i=0;i<48;i++){
         children[i] = new N4({},0);
-        node.insert(i, children[i]);
+        node.insertGrow(i, children[i]);
     }
     assert(node.type == NTypes::N48);
 }
@@ -68,10 +68,13 @@ void testN(){
 
 int main(){
     testN4();
+    cout << "finish test N4" << endl;
     testN48();
+    cout << "finish test N48" << endl;
     testN256();
-    cout << "finish basic class test" << endl;
+    cout << "======finish basic Node test======" << endl;
+
     testN();
     cout << "finish grow test" << endl;
-    
+    return 0;
 }

@@ -27,7 +27,7 @@ bool N16::insert(uint8_t k, N* node){
     assert(false);
 }
 
-N* N4::getChild(uint8_t k){
+N* N16::getChild(uint8_t k){
     for(int i=0;i<16;i++){
         if(children[i]!=nullptr && this->keys[i]==k)
             return children[i];

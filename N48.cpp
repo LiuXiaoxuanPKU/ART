@@ -9,12 +9,16 @@
 #include <stdio.h>
 #include <assert.h>
 #include "N.hpp"
+#include <iostream>
+using namespace std;
 
 bool N48::insert(uint8_t k, N* n){
     if(count==48)
         return false;
-    unsigned pos = 0;
-    for(;children[pos]!=nullptr;pos++);
+    unsigned int pos = 0;
+    while(children[pos]!=nullptr){
+        pos = (pos + 1)%48;
+    }
     children[pos] = n;
     child_index[k] = pos;
     count++;

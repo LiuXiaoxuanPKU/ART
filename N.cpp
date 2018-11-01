@@ -13,7 +13,7 @@ void N::insertGrow(curN *n, uint8_t k, N *node, uint8_t key_par, N* node_par){
     // current node is not full
     if(n->insert(k,node))
         return;
-    
+
     // initialize a bigger node
     auto big_node = new biggerN(n->prefix, n->prefix_len);
     // copy original keys and children
@@ -28,7 +28,7 @@ void N::insertGrow(curN *n, uint8_t k, N *node, uint8_t key_par, N* node_par){
 
 template<typename curN, typename biggerN>
 void N::removeAndShrink(curN* n, uint8_t k){
-    
+
 }
 
 void N::change(N *node, uint8_t key, N *val){
@@ -57,3 +57,5 @@ void N::change(N *node, uint8_t key, N *val){
             break;
     }
 }
+
+void N::insertNode()
