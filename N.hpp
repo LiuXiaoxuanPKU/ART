@@ -63,6 +63,7 @@ public:
     bool insert(uint8_t key, N*node);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    
     N* getChild(uint8_t key);
 };
 

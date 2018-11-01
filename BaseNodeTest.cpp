@@ -56,11 +56,16 @@ void testN256(){
 
 void testN(){
     uint8_t rootprefix[2] = {200,201};
+    N4 parent({},0);
     N4 node(rootprefix,2);
+    // bad code
+    uint8_t parent_key = -1;
+    parent.insert(parent_key,&node);
+
     N4* children[50];
     for(int i=0;i<48;i++){
         children[i] = new N4({},0);
-        node.insertGrow(i, children[i]);
+        N::insertNode(&node, &parent,parent_key, (uint8_t)i, children[i]);
     }
     assert(node.type == NTypes::N48);
 }

@@ -7,11 +7,13 @@
 //
 
 #include "N.hpp"
+#include<iostream>
+using namespace std;
 
 template<typename curN, typename biggerN>
-void N::insertGrow(curN *n, uint8_t k, N *node, uint8_t key_par, N* node_par){
+void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N* node_par){
     // current node is not full
-    if(n->insert(k,node))
+    if(n->insert(key,val))
         return;
 
     // initialize a bigger node
@@ -19,7 +21,7 @@ void N::insertGrow(curN *n, uint8_t k, N *node, uint8_t key_par, N* node_par){
     // copy original keys and children
     n->copyTo(big_node);
     // insert key,val to the new node
-    big_node->insert(k,node);
+    big_node->insert(key,val);
     // replace old node with new node
     change(node_par, key_par, big_node);
     // delete old node
@@ -58,4 +60,29 @@ void N::change(N *node, uint8_t key, N *val){
     }
 }
 
-void N::insertNode()
+void N::insertNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val){
+    switch (node->type) {
+        case NTypes::N4:{
+            auto n = static_cast<N4 *>(node);
+            insertGrow<N4, N16>(n, key, val, keyParent, parentNode);
+            return;
+        }
+        case NTypes::N16:{
+            auto n = static_cast<N16 *>(node);
+            insertGrow<N16, N48>(n, key, val, keyParent, parentNode);
+            return;
+        }
+        case NTypes::N48:{
+            auto n = static_cast<N48 *>(node);
+            insertGrow<N48, N256>(n, key, val, keyParent, parentNode);
+            return;
+        }
+        case NTypes::N256:{
+            auto n = static_cast<N256 *>(node);
+            n->insert(key, val);
+            return;
+        }
+    }
+    cout << "[Error]insertNode" << endl;
+    assert(false);
+}
