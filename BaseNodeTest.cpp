@@ -7,7 +7,7 @@
 //
 
 #include <stdio.h>
-#include "N.hpp"
+#include "N.h"
 #include <iostream>
 #include <assert.h>
 
@@ -71,6 +71,7 @@ void testN(){
 }
 
 
+
 int main(){
     testN4();
     cout << "finish test N4" << endl;
@@ -79,7 +80,7 @@ int main(){
     testN256();
     cout << "======finish basic Node test======" << endl;
 
-    testN();
+  //  testN();
     cout << "finish grow test" << endl;
     return 0;
 }

@@ -6,8 +6,8 @@
 //  Copyright © 2018 xiaoxuan. All rights reserved.
 //
 
-#ifndef N_hpp
-#define N_hpp
+#ifndef N_h
+#define N_h
 
 #include <stdio.h>
 #include <stdint.h>    // integer types
@@ -44,10 +44,11 @@ public:
     static void insertGrow(curN* n, uint8_t k, N* node, uint8_t key_par, N* parent);
 
     template<typename curN, typename smallerN>
-    static void removeAndShrink(curN* n, uint8_t k);
+    static void removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parent);
 
     // API for tree classes
     static void insertNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val);
+    static void removeNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key);
     static void change(N *node, uint8_t key, N *val);
 
 
@@ -63,7 +64,8 @@ public:
     bool insert(uint8_t key, N*node);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
-    
+    template<class NODE>
+    void copyTo(NODE *n) const;
     N* getChild(uint8_t key);
 };
 
@@ -77,6 +79,8 @@ public:
     bool insert(uint8_t key, N*node);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    template<class NODE>
+    void copyTo(NODE *n) const;
     N* getChild(uint8_t key);
 
 };
@@ -91,6 +95,8 @@ public:
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    template<class NODE>
+    void copyTo(NODE *n) const;
     N* getChild(uint8_t k) const;
 
 };
@@ -103,9 +109,11 @@ public:
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    template<class NODE>
+    void copyTo(NODE *n) const;
     N* getChild(uint8_t k) const;
 };
 
 
 
-#endif /* N_hpp */
+#endif /* N_h */
