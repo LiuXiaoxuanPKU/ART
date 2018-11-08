@@ -12,52 +12,52 @@
 using namespace std;
 
 bool N4::insert(uint8_t k, N* node){
-		if(count==4)
-				return false;
-		for(unsigned i=0; i<4; i++) {
-				if(children[i] == nullptr) {
-						keys[i] = k;
-						children[i] = node;
-						count++;
-						return true;
-				}
+	if(count==4)
+		return false;
+	for(unsigned i=0; i<4; i++) {
+		if(children[i] == nullptr) {
+			keys[i] = k;
+			children[i] = node;
+			count++;
+			return true;
 		}
-		cout << " Wrong count in inserting N4" << endl;
-		assert(false);
+	}
+	cout << " Wrong count in inserting N4" << endl;
+	assert(false);
 }
 
 N* N4::getChild(uint8_t k){
-		for(int i=0; i<4; i++) {
-				if(children[i]!=nullptr && this->keys[i]==k)
-						return children[i];
-		}
-		return nullptr;
+	for(int i=0; i<4; i++) {
+		if(children[i]!=nullptr && this->keys[i]==k)
+			return children[i];
+	}
+	return nullptr;
 }
 
 bool N4::remove(uint8_t k){
-		for(int i=0; i<4; i++) {
-				if(children[i]!=nullptr && keys[i]==k) {
-						count--;
-						children[i] = nullptr;
-						return true;
-				}
+	for(int i=0; i<4; i++) {
+		if(children[i]!=nullptr && keys[i]==k) {
+			count--;
+			children[i] = nullptr;
+			return true;
 		}
-		cout << " Remove N4 element not exist" << endl;
-		assert(false);
+	}
+	cout << " Remove N4 element not exist" << endl;
+	assert(false);
 }
 
 void N4::change(uint8_t key, N *val){
-		for(int i=0; i<4; i++) {
-				if(children[i] != nullptr && keys[i] == key) {
-						children[i] = val;
-						return;
-				}
+	for(int i=0; i<4; i++) {
+		if(children[i] != nullptr && keys[i] == key) {
+			children[i] = val;
+			return;
 		}
+	}
 }
 template<class NODE>
 void N4::copyTo(NODE *n) const {
-		for (int i = 0; i < 4; i++) {
-				if(children[i]!=nullptr)
-						n->insert(keys[i],children[i]);
-		}
+	for (int i = 0; i < 4; i++) {
+		if(children[i]!=nullptr)
+			n->insert(keys[i],children[i]);
+	}
 }

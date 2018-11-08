@@ -13,53 +13,53 @@
 using namespace std;
 
 bool N16::insert(uint8_t k, N* node){
-		if(count==16)
-				return false;
-		for(unsigned i=0; i<16; i++) {
-				if(children[i] == nullptr) {
-						keys[i] = k;
-						children[i] = node;
-						count++;
-						return true;
-				}
+	if(count==16)
+		return false;
+	for(unsigned i=0; i<16; i++) {
+		if(children[i] == nullptr) {
+			keys[i] = k;
+			children[i] = node;
+			count++;
+			return true;
 		}
-		cout << " Wrong count in inserting N4" << endl;
-		assert(false);
+	}
+	cout << " Wrong count in inserting N4" << endl;
+	assert(false);
 }
 
 N* N16::getChild(uint8_t k){
-		for(int i=0; i<16; i++) {
-				if(children[i]!=nullptr && this->keys[i]==k)
-						return children[i];
-		}
-		return nullptr;
+	for(int i=0; i<16; i++) {
+		if(children[i]!=nullptr && this->keys[i]==k)
+			return children[i];
+	}
+	return nullptr;
 }
 
 bool N16::remove(uint8_t k){
-		for(int i=0; i<16; i++) {
-				if(children[i]!=nullptr && keys[i]==k) {
-						count--;
-						children[i] = nullptr;
-						return true;
-				}
+	for(int i=0; i<16; i++) {
+		if(children[i]!=nullptr && keys[i]==k) {
+			count--;
+			children[i] = nullptr;
+			return true;
 		}
-		cout << " [Error]Remove N16 element not exist" << endl;
-		assert(false);
+	}
+	cout << " [Error]Remove N16 element not exist" << endl;
+	assert(false);
 }
 
 void N16::change(uint8_t key, N *val){
-		for(int i=0; i<16; i++) {
-				if(children[i] != nullptr && keys[i] == key) {
-						children[i] = val;
-						return;
-				}
+	for(int i=0; i<16; i++) {
+		if(children[i] != nullptr && keys[i] == key) {
+			children[i] = val;
+			return;
 		}
+	}
 }
 
 template<class NODE>
 void N16::copyTo(NODE* n) const {
-		for(int i = 0; i < 16; i++) {
-				if(children[i]!=nullptr)
-						n->insert(keys[i], children[i]);
-		}
+	for(int i = 0; i < 16; i++) {
+		if(children[i]!=nullptr)
+			n->insert(keys[i], children[i]);
+	}
 }
