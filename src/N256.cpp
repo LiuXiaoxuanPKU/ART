@@ -31,9 +31,7 @@ void N256::change(uint8_t key, N *val){
 
 template<class NODE>
 void N256::copyTo(NODE *n) const {
-	for(int i = 0; i < 256; i++) {
-		if(children[i] != nullptr) {
-			n->insert(i,children[i]);
-		}
+	for(int i = 0; i < count; i++) {
+		n->insert(i,children[i]);
 	}
 }

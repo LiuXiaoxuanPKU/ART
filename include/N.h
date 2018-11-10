@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdint.h>    // integer types
 
+
 static const unsigned maxPrefixLen = 9;
 enum class NTypes: uint8_t{
     N4 = 0,
@@ -40,10 +41,10 @@ public:
             prefix[i] = _prefix[i];
     };
 
-    template<typename curN, typename biggerN>
+    template<class curN, class biggerN>
     static void insertGrow(curN* n, uint8_t k, N* node, uint8_t key_par, N* parent);
 
-    template<typename curN, typename smallerN>
+    template<class curN, class smallerN>
     static void removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parent);
 
     // API for tree classes
@@ -64,9 +65,9 @@ public:
     bool insert(uint8_t key, N*node);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    N* getChild(uint8_t key);
     template<class NODE>
     void copyTo(NODE *n) const;
-    N* getChild(uint8_t key);
 };
 
 class N16:public N{
@@ -74,7 +75,7 @@ public:
     uint8_t keys[16];
     N* children[16] = {nullptr};
 
-    N16(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N4, prefix, prefix_len){};
+    N16(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N16, prefix, prefix_len){};
     // TODO
     bool insert(uint8_t key, N*node);
     bool remove(uint8_t key);
@@ -91,7 +92,7 @@ public:
     N* children[48] = {nullptr};
     static const uint8_t empty_marker = 48;
 
-    N48(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N4, prefix, prefix_len){};
+    N48(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N48, prefix, prefix_len){};
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
@@ -105,7 +106,7 @@ class N256:public N{
 public:
     N* children[256] = {nullptr};
 
-    N256(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N4, prefix, prefix_len){};
+    N256(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N256, prefix, prefix_len){};
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);

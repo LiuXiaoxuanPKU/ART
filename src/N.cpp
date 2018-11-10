@@ -7,10 +7,16 @@
 //
 
 #include "N.h"
+
+#include "N4.cpp"
+#include "N16.cpp"
+#include "N48.cpp"
+#include "N256.cpp"
+
 #include <iostream>
 using namespace std;
 
-template<typename curN, typename biggerN>
+template<class curN, class biggerN>
 void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
 	// current node is not full
 	if(n->insert(key,val))
@@ -24,11 +30,12 @@ void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
 	big_node->insert(key,val);
 	// replace old node with new node
 	N::change(node_par, key_par, big_node);
+	
 	// delete old node
 	delete n;
 }
 
-template<typename curN, typename smallerN>
+template<class curN, class smallerN>
 void N::removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parentNode){
 
 	// initialize a smaller node
