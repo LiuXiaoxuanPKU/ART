@@ -27,6 +27,8 @@ bool N48::insert(uint8_t k, N* n){
 
 bool N48::remove(uint8_t k){
 	assert(child_index[k] != empty_marker);
+	if(count == 16)
+		return false;
 	children[child_index[k]] = nullptr;
 	child_index[k] = empty_marker;
 	count--;

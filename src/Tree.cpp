@@ -1,73 +1,80 @@
 #include "Tree.h"
+#include<iostream>
+using namespace std;
 
 Tree::Tree() : root(new N256(nullptr, 0)){
 };
-//
-// Tree::~Tree(){
-//
-// }
-//
+
+Tree::~Tree(){
+  delete root;
+}
+
 // void* Tree::lookup() const {
 //
 // }
 //
 //
-// void Tree::insert(uint8_t[] key, void *value){
-//  N *node = nullptr;
-//  N *nextNode = root;
-//  N *parentNode = nullptr;
-//  uint8_t parentKey, nodeKey = 0;
-//  int level = 0;
-//
-//  while (true) {
-//      parentNode = node;
-//      parentKey = nodeKey;
-//      node = nextNode;
-//
-//      // int nextLevel = level;
-//      // nodeKey = key[level];
-//      // nextNode = N::getChild(nodeKey, node);
-//
-//      if(prefixMatch(node, key, nextLevel, commonPrefix, remainPrefix)) {
-//          //continue;
-//      } else {
-//          // create new node to hold split results
-//          auto newNode = new N4(commonPrefix, nextLevel - level);
-//
-//          // add node and val, node as children
-//          newNode->insert(k[nextLevel], N::setLeaf(val));
-//          newNode->insert(remainPrefix, node);
-//
-//          // update parent node to point to new node
-//          N::change(parentNode, parentKey, newNode);
-//
-//          return;
-//      }
-//
-//      level = nextLevel;
-//      nodeKey = key[level];
-//      nextNode = N::getChild(node, nodeKey);
-//      if(nextNode == nullptr) {
-//          N::insertNode(node, key, N::setLeaf(value), parentKey, parentNode);
-//          return;
-//      }
-//      if(N::isLeaf(nextNode)) {
-//          // Get the key of leaf node
-//          leaf_key = "";
-//          int prefix_len = 0;
-//          // find split point
-//          while(leaf_key[level + prefix_len] == key[level + prefix_len])
-//              prefix_len++;
-//          auto n4 = new N4(key[level], prefix_len);
-//          n4->insert(key[level + prefix_len], N::setLeaf(val));
-//          n4->insert(leaf_key[level + prefix_leaf], nextNode);
-//          N::change(node, k[level-1], n4);
-//          return;
-//      }
-//      level++;
-//  }
-// }
-//
+
+void Tree::insert(uint8_t *key, void *value, int insertKeySize){
+ N *node = nullptr;
+ N *nextNode = root;
+ N *parentNode = nullptr;
+ uint8_t parentKey, nodeKey = 0;
+ int keyLevel = 0;
+
+ while (true) {
+     parentNode = node;
+     parentKey = nodeKey;
+     node = nextNode;
+     uint8_t commonPrefix[maxPrefixLen];
+
+     // checkPrefix
+     if(prefixMatch(node, key, insertKeySize,
+                    keyLevel, nodeLevel
+                    commonPrefix)) {
+         if(node->prefix_len == insertKeySize){
+            node->insert(0,N::setLeaf(val));
+            return;
+        }
+        // size of remainKey is 1
+        if(keyLevel == insertKeySize - 1){
+            node->insert(remainKey,N:setLeaf(val));
+            return;
+        }
+        nextNode = N::getChild(nodeKey, node);
+        if(nextNode == nullptr){
+            uint8_t leafKey[maxPrefixLen];
+            subKey(keyLevel+1, insertKeySize, leafKey, key);
+            auto leaf = new N4(leafKey, insertKeySize - keyLevel - 1);
+            leaf->insert(0,N::setLeaf(val));
+            node->insert(leaf);
+            return;
+        }
+        keyLevel++;
+     } else {
+         // create new node to hold split results
+         // nodeLevel = size(commonPrefix)
+         auto newNode = new N4(commonPrefix, nodeLevel);
+
+        if(keyLevel == insertKeySize - 1)
+            newNode->insert(key[keyLevel],N::setLeaf(val))
+        else{
+            uint8_t leafKey[maxPrefixLen];
+            subKey(keyLevel+1, insertKeySize, leafKey, key);
+            auto leaf = new N4(leafKey,insertKeySize - keyLevel - 1);
+            leaf->insert(0,N::setLeaf(val));
+            newNode->insert(key[keyLevel],leaf);
+        }    
+        N* dupLeaf = node->duplicate();
+        uint8_t leafKey[maxPrefixLen];
+        subKey(nodeLevel+1, node->prefix_len, leafKey, nodeKey);
+        dupLeaf->setPrefix(leafKey);
+        newNode->insert(node->prefix[nodeLevel],dupLeaf);
+        // update parent node to point to new node
+        N::change(parentNode, parentKey, newNode);
+     }
+}
+
 // void Tree::remove(uint8_t[] key, void *value){
 //  N *node = nullptr;
 //  N *nextNode = root;
@@ -107,24 +114,18 @@ Tree::Tree() : root(new N256(nullptr, 0)){
 // }
 //
 //
-// bool Tree::prefixMatch(N *node, uint8_t[] key,
-//                        int& level, uint8_t[] commonPrefix,
-//                        uint8_t[] remainPrefix){
-//  uint8_t *nodePrefix = node->prefix;
-//  int sizeKey = sizeof(key)/sizeof(*key);
-//  int i = 0;
-//  for(; i<node->prefix_len; i++) {
-//      if(level+i >= sizeKey || key[level+i] != nodePrefix[i]) {
-//          int cnt = 0;
-//          for(int j=i; j<node->prefix_len; j++) {
-//              remainPrefix[cnt] = nodePrefix[j];
-//              cnt += 1;
-//          }
-//          level += i;
-//          return false;
-//      }
-//      commonPrefix[i] = nodePrefix[i];
-//  }
-//  level += i;
-//  return true;
-// }
+bool Tree::prefixMatch(N *node,uint8_t *key, int sizeKey,
+                       int &keyLevel, int &nodeLevel,
+                       uint8_t *commonPrefix){
+    uint8_t *nodePrefix = node->prefix;
+    for(; nodeLevel<node->prefix_len; nodeLevel++) {
+        if(keyLevel+nodeLevel >= sizeKey ||
+            key[keyLevel+nodeLevel] != nodePrefix[nodeLevel]) {
+            keyLevel += nodeLevel;
+            return false;
+        }
+        commonPrefix[nodeLevel] = nodePrefix[nodeLevel];
+    }
+    keyLevel += nodeLevel;
+    return true;
+}

@@ -11,9 +11,14 @@ public:
   void remove(const uint8_t *key);
   ~Tree();
 
+  static bool prefixMatch(N *node,uint8_t *key, int sizeKey,
+                   int &keyLevel, int &nodeLevel,
+                   uint8_t *commonPrefix);
+  static int getSize(uint8_t *key);
+
+
 private:
   N *root;
-  bool prefixMatch();
 };
 
 #endif

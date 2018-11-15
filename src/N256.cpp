@@ -16,6 +16,8 @@ bool N256::insert(uint8_t k, N* n){
 }
 
 bool N256::remove(uint8_t k){
+	if(count == 48)
+		return false;
 	children[k] = nullptr;
 	count--;
 	return true;

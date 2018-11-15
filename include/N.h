@@ -41,6 +41,9 @@ public:
             prefix[i] = _prefix[i];
     };
 
+    void setPrefix(const uint8_t *prefix, int length);
+    N* duplicate();
+
     template<class curN, class biggerN>
     static void insertGrow(curN* n, uint8_t k, N* node, uint8_t key_par, N* parent);
 
@@ -51,8 +54,8 @@ public:
     static void insertNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val);
     static void removeNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key);
     static void change(N *node, uint8_t key, N *val);
-
-
+    static N* setLeaf(N* node);
+    static bool isLeaf(N* node);
 };
 
 class N4:public N{

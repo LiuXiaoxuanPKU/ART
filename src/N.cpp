@@ -16,6 +16,26 @@
 #include <iostream>
 using namespace std;
 
+void N::setPrefix(const uint8_t *_prefix, int length){
+	for(int i=0; i<length; i++){
+		prefix[i] = _prefix[i];
+	}
+	prefix_len = length;
+}
+
+N* N::setLeaf(N* n){
+	// 7fff ffff  + 1
+	// 8000 0000 | n
+	return reinterpret_cast<N*>((static_cast<uint64_t>(1) << 63) |
+	 													reinterpret_cast<uint64_t>(n));
+}
+
+bool N::isLeaf(N* n){
+	// use & 1 instead &ffffffffffffffff becuase of the difference
+	// in treating >> in macos and linux
+	return ((reinterpret_cast<uint64_t>(n) >> 63 & 1) == 1);
+}
+
 template<class curN, class biggerN>
 void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
 	// current node is not full
@@ -30,14 +50,15 @@ void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
 	big_node->insert(key,val);
 	// replace old node with new node
 	N::change(node_par, key_par, big_node);
-	
+
 	// delete old node
 	delete n;
 }
 
 template<class curN, class smallerN>
 void N::removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parentNode){
-
+	if(n->remove(key))
+		return;
 	// initialize a smaller node
 	auto nSmall = new smallerN(n->prefix, n->prefix_len);
 	// remove key
@@ -46,6 +67,8 @@ void N::removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parentNode){
 	n->copyTo(nSmall);
 	// replace old node with new node
 	N::change(parentNode, key_par, nSmall);
+
+	delete n;
 }
 
 void N::change(N *node, uint8_t key, N *val){
@@ -127,4 +150,34 @@ void N::removeNode(N *node, N *parentNode, uint8_t key_par, uint8_t key){
 	}
 	cout << "[Error]remove and shrink Node" << endl;
 	assert(false);
+}
+
+N* N::duplicate(){
+	switch (this->type) {
+		case NTypes::N4:{
+			N4 *newNode = new N4(prefix, prefix_len);
+			N4 *node = reinterpret_cast<N4*>(this);
+			node->copyTo(newNode);
+			return newNode;
+		}
+		case NTypes::N16:{
+			N16 *newNode = new N16(prefix, prefix_len);
+			N16 *node = reinterpret_cast<N16*>(this);
+			node->copyTo(newNode);
+			return newNode;
+		}
+		case NTypes::N48:{
+			N48 *newNode = new N48(prefix, prefix_len);
+			N48 *node = reinterpret_cast<N48*>(this);
+			node->copyTo(newNode);
+			return newNode;
+		}
+		case NTypes::N256:{
+			N256 *newNode = new N256(prefix, prefix_len);
+			N256 *node = reinterpret_cast<N256*>(this);
+			node->copyTo(newNode);
+			return newNode;
+		}
+	}
+	return nullptr;
 }

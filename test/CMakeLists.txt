@@ -11,3 +11,4 @@ function (add_unit_test file_name)
 endfunction()
 
 add_unit_test(NodeTest)
+add_unit_test(TreeTest)

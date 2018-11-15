@@ -36,6 +36,10 @@ N* N16::getChild(uint8_t k){
 }
 
 bool N16::remove(uint8_t k){
+	// if we need shrink, return false
+	if(count == 4)
+		return false;
+	
 	for(int i = 0; i < count; i++) {
 		if(keys[i]==k) {
 			memcpy(keys + i, keys + i + 1, (count - i - 1) * sizeof(k));
