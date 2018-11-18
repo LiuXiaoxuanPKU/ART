@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <stdint.h>    // integer types
-
+#include <tuple> // tuple for getChildren
 
 static const unsigned maxPrefixLen = 9;
 enum class NTypes: uint8_t{
@@ -30,7 +30,7 @@ public:
     uint8_t count = 0;
 
     // length of compressed path
-    uint32_t prefix_len;
+    uint32_t prefix_len = 0;
 
     // compressed path
     uint8_t prefix[maxPrefixLen];
@@ -43,6 +43,7 @@ public:
 
     void setPrefix(const uint8_t *prefix, int length);
     N* duplicate();
+    bool insert(uint8_t key, N*node);
 
     template<class curN, class biggerN>
     static void insertGrow(curN* n, uint8_t k, N* node, uint8_t key_par, N* parent);
@@ -55,14 +56,17 @@ public:
     static void removeNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key);
     static void change(N *node, uint8_t key, N *val);
     static N* setLeaf(N* node);
+    static N* getValueFromLeaf(N* leaf);
     static bool isLeaf(N* node);
+    static N* getChild(uint8_t key, N* node);
+    static void getChilren(N* node, uint8_t start, uint8_t end,
+    	std::tuple<uint8_t, N *> children[], int &childCount);
 };
 
 class N4:public N{
 public:
     uint8_t keys[4];
     N* children[4] = {nullptr};
-    N* getChild(const uint8_t k)const;
 
     N4(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N4, prefix, prefix_len){};
     bool insert(uint8_t key, N*node);
@@ -83,10 +87,9 @@ public:
     bool insert(uint8_t key, N*node);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    N* getChild(uint8_t key);
     template<class NODE>
     void copyTo(NODE *n) const;
-    N* getChild(uint8_t key);
-
 };
 
 class N48:public N{
@@ -99,10 +102,9 @@ public:
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    N* getChild(uint8_t k) const;
     template<class NODE>
     void copyTo(NODE *n) const;
-    N* getChild(uint8_t k) const;
-
 };
 
 class N256:public N{
@@ -113,9 +115,9 @@ public:
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);
+    N* getChild(uint8_t k) const;
     template<class NODE>
     void copyTo(NODE *n) const;
-    N* getChild(uint8_t k) const;
 };
 
 

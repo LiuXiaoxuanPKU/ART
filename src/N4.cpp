@@ -25,14 +25,6 @@ bool N4::insert(uint8_t k, N* node){
 	return true;
 }
 
-N* N4::getChild(uint8_t k){
-	for(unsigned int i = 0; i < count; i++) {
-		if(this->keys[i]==k)
-			return children[i];
-	}
-	return nullptr;
-}
-
 bool N4::remove(uint8_t k){
 	for(int i = 0; i < count; i++) {
 		if(keys[i]==k) {
@@ -53,6 +45,14 @@ void N4::change(uint8_t key, N *val){
 			return;
 		}
 	}
+}
+
+N* N4::getChild(uint8_t k){
+	for(unsigned int i = 0; i < count; i++) {
+		if(this->keys[i]==k)
+			return children[i];
+	}
+	return nullptr;
 }
 
 template<class NODE>

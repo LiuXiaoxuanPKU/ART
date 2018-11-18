@@ -181,3 +181,56 @@ N* N::duplicate(){
 	}
 	return nullptr;
 }
+
+bool N::insert(uint8_t key, N*node){
+	switch (this->type) {
+		case NTypes::N4:{
+			return reinterpret_cast<N4*>(this)->insert(key, node);
+		}
+		case NTypes::N16:{
+			return reinterpret_cast<N16*>(this)->insert(key, node);
+		}
+		case NTypes::N48:{
+			return reinterpret_cast<N48*>(this)->insert(key, node);
+		}
+		case NTypes::N256:{
+			return reinterpret_cast<N256*>(this)->insert(key, node);
+		}
+	}
+	return false;
+}
+
+N* N::getChild(uint8_t key, N* node){
+	switch (node->type) {
+		case NTypes::N4:{
+			return reinterpret_cast<N4*>(node)->getChild(key);
+		}
+		case NTypes::N16:{
+			return reinterpret_cast<N16*>(node)->getChild(key);
+		}
+		case NTypes::N48:{
+			return reinterpret_cast<N48*>(node)->getChild(key);
+		}
+		case NTypes::N256:{
+			return reinterpret_cast<N256*>(node)->getChild(key);
+		}
+	}
+	return nullptr;
+}
+
+void N::getChilren(N* node, uint8_t start, uint8_t end,
+	std::tuple<uint8_t, N *> children[], int &childCount){
+	childCount = 0;
+	for(uint8_t cur = start; cur < end; cur++){
+		//cout << "Current key:"<<unsigned(cur)<<endl;
+		N* child = getChild(cur, node);
+		if(child  == nullptr)
+			continue;
+		children[childCount] = make_tuple(cur, child);
+		childCount++;
+	}
+}
+
+N* N::getValueFromLeaf(N*leaf){
+	return reinterpret_cast<N*>(reinterpret_cast<uint64_t>(leaf) & 0x7fffffffffffffff);
+}
