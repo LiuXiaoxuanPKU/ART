@@ -14,7 +14,7 @@ using namespace std;
 bool N4::insert(uint8_t k, N* node){
 	if(count == 4)
 		return false;
-	unsigned int i = 0;
+    int i = 0;
 	while(i < count && k >= keys[i])
 		i += 1;
 	memcpy(keys + i + 1, keys + i, (count - i) * sizeof(k));
@@ -39,7 +39,7 @@ bool N4::remove(uint8_t k){
 }
 
 void N4::change(uint8_t key, N *val){
-	for(int i = 0; i < count; i++) {
+	for(uint8_t i = 0; i < count; i++) {
 		if(children[i] != nullptr && keys[i] == key) {
 			children[i] = val;
 			return;
@@ -48,9 +48,10 @@ void N4::change(uint8_t key, N *val){
 }
 
 N* N4::getChild(uint8_t k){
-	for(unsigned int i = 0; i < count; i++) {
-		if(this->keys[i]==k)
+	for(int i = 0; i < count; i++) {
+		if(this->keys[i]==k){
 			return children[i];
+		}
 	}
 	return nullptr;
 }

@@ -32,32 +32,42 @@ protected:
 			N* curNode = l.front();
 			l.pop();
 			std::tuple<uint8_t, N *> children[256];
-			int childCount = 0;
-			N::getChilren(curNode, 0, 255, children, childCount);
-			for(int i=0;i < childCount;i++){
+			cout<<"("<<cnt<<")"<<endl;
+			N::getChildren(curNode, 0, 255, children);
+			for(unsigned int i=0;i < curNode->count;i++){
 				N* curChild = get<1>(children[i]);
-				int start_id = visit.find(curNode)->second;
+				int start_id = -1;
+				start_id = visit.find(curNode)->second;
 				int end_id = -1;
+				uint8_t curKey = get<0>(children[i]);
 				if(N::isLeaf(curChild)){
 					out << "\t";
-					end_id = reinterpret_cast<uint64_t>(N::getValueFromLeaf(curChild));
-					out << start_id <<" -> "<< end_id<<endl;
+					int end_val = reinterpret_cast<uint64_t>(N::getValueFromLeaf(curChild));
+					out << start_id <<" -> "<< end_id<<end_val<<"[label=\""<<unsigned(curKey)<<"\"]";
+					out <<";"<<endl;
 					continue;
 				}
 				if(visit.find(curChild)==visit.end()){
 					cnt += 1;
 					visit.insert(pair<N*,int>(curChild,cnt));
+					l.push(curChild);
 				}
 
 				end_id = visit.find(curChild)->second;
 
 				out << "\t";
-				out << start_id <<" -> "<< end_id <<"(";
-				for(int j=0;j<curChild->prefix_len;j++)
-					out << curChild->prefix[j];
-				out << ");"<<endl;
-
+				out << start_id <<" -> "<< end_id <<"[label=\"";
+				out << unsigned(curKey);
+				out << "\"];"<<endl;
 			}
+
+		}
+		for(auto it=visit.begin();it!=visit.end();++it){
+			out << "\t"<<it->second<<"[label=\"";
+			for(int j=0;j<it->first->prefix_len;j++){
+				out << unsigned(it->first->prefix[j]);
+			}
+			out << "\",shape=box];"<<endl;
 		}
 		out << "}";
 		out.close();
@@ -113,11 +123,23 @@ TEST_F(TreeTest, BaseInsert){
 	Tree *test = new  Tree();
 	uint8_t key1[] = {1};
 	uint8_t key2[] = {1,4,5};
+	uint8_t key3[] = {2};
+	uint8_t key4[] = {2,5};
+	uint8_t key5[] = {1,4,5,7,8,9};
+	uint8_t key6[] = {1,4,5,7,8,7};
 	uint64_t val1 = 123;
-	uint64_t val2 = 456;
+	uint64_t val2 = 145;
+	uint64_t val3 = 2;
+	uint64_t val4 = 25;
+	uint64_t val5 = 145789;
+	uint64_t val6 = 145787;
 	test->insert(key1, reinterpret_cast<N*>(val1), 1);
 	test->insert(key2, reinterpret_cast<N*>(val2),3);
-	visTree(test, "Test");
+	test->insert(key3, reinterpret_cast<N*>(val3),1);
+	test->insert(key4, reinterpret_cast<N*>(val4),2);
+	test->insert(key5, reinterpret_cast<N*>(val5),6);
+	// test->insert(key6, reinterpret_cast<N*>(val6),6);
+	visTree(test, "graph1.gv");
 	delete test;
 }
 

@@ -52,15 +52,15 @@ public:
     static void removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parent);
 
     // API for tree classes
-    static void insertNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val);
+    static void insertOrUpdateNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val);
     static void removeNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key);
     static void change(N *node, uint8_t key, N *val);
     static N* setLeaf(N* node);
     static N* getValueFromLeaf(N* leaf);
     static bool isLeaf(N* node);
     static N* getChild(uint8_t key, N* node);
-    static void getChilren(N* node, uint8_t start, uint8_t end,
-    	std::tuple<uint8_t, N *> children[], int &childCount);
+    static void getChildren(N* node, uint8_t start, uint8_t end,
+    	std::tuple<uint8_t, N *> children[]);
 };
 
 class N4:public N{

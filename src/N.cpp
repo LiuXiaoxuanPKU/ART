@@ -17,7 +17,7 @@
 using namespace std;
 
 void N::setPrefix(const uint8_t *_prefix, int length){
-	for(int i=0; i<length; i++){
+	for(int i=0; i<length; i++) {
 		prefix[i] = _prefix[i];
 	}
 	prefix_len = length;
@@ -27,7 +27,7 @@ N* N::setLeaf(N* n){
 	// 7fff ffff  + 1
 	// 8000 0000 | n
 	return reinterpret_cast<N*>((static_cast<uint64_t>(1) << 63) |
-	 													reinterpret_cast<uint64_t>(n));
+	                            reinterpret_cast<uint64_t>(n));
 }
 
 bool N::isLeaf(N* n){
@@ -38,6 +38,11 @@ bool N::isLeaf(N* n){
 
 template<class curN, class biggerN>
 void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
+	// current key has alreay existed
+	if(n->getChild(key)!=nullptr) {
+		n->change(key,val);
+		return;
+	}
 	// current node is not full
 	if(n->insert(key,val))
 		return;
@@ -98,7 +103,7 @@ void N::change(N *node, uint8_t key, N *val){
 	}
 }
 
-void N::insertNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val){
+void N::insertOrUpdateNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *val){
 	switch (node->type) {
 	case NTypes::N4: {
 		auto n = static_cast<N4 *>(node);
@@ -117,7 +122,10 @@ void N::insertNode(N *node, N *parentNode, uint8_t keyParent, uint8_t key, N *va
 	}
 	case NTypes::N256: {
 		auto n = static_cast<N256 *>(node);
-		n->insert(key, val);
+		if(n->getChild(key)!=nullptr)
+			n->change(key,val);
+		else
+			n->insert(key, val);
 		return;
 	}
 	}
@@ -154,80 +162,86 @@ void N::removeNode(N *node, N *parentNode, uint8_t key_par, uint8_t key){
 
 N* N::duplicate(){
 	switch (this->type) {
-		case NTypes::N4:{
-			N4 *newNode = new N4(prefix, prefix_len);
-			N4 *node = reinterpret_cast<N4*>(this);
-			node->copyTo(newNode);
-			return newNode;
-		}
-		case NTypes::N16:{
-			N16 *newNode = new N16(prefix, prefix_len);
-			N16 *node = reinterpret_cast<N16*>(this);
-			node->copyTo(newNode);
-			return newNode;
-		}
-		case NTypes::N48:{
-			N48 *newNode = new N48(prefix, prefix_len);
-			N48 *node = reinterpret_cast<N48*>(this);
-			node->copyTo(newNode);
-			return newNode;
-		}
-		case NTypes::N256:{
-			N256 *newNode = new N256(prefix, prefix_len);
-			N256 *node = reinterpret_cast<N256*>(this);
-			node->copyTo(newNode);
-			return newNode;
-		}
+	case NTypes::N4: {
+		N4 *newNode = new N4(prefix, prefix_len);
+		N4 *node = reinterpret_cast<N4*>(this);
+		node->copyTo(newNode);
+		return newNode;
+	}
+	case NTypes::N16: {
+		N16 *newNode = new N16(prefix, prefix_len);
+		N16 *node = reinterpret_cast<N16*>(this);
+		node->copyTo(newNode);
+		return newNode;
+	}
+	case NTypes::N48: {
+		N48 *newNode = new N48(prefix, prefix_len);
+		N48 *node = reinterpret_cast<N48*>(this);
+		node->copyTo(newNode);
+		return newNode;
+	}
+	case NTypes::N256: {
+		N256 *newNode = new N256(prefix, prefix_len);
+		N256 *node = reinterpret_cast<N256*>(this);
+		node->copyTo(newNode);
+		return newNode;
+	}
 	}
 	return nullptr;
 }
 
 bool N::insert(uint8_t key, N*node){
 	switch (this->type) {
-		case NTypes::N4:{
-			return reinterpret_cast<N4*>(this)->insert(key, node);
-		}
-		case NTypes::N16:{
-			return reinterpret_cast<N16*>(this)->insert(key, node);
-		}
-		case NTypes::N48:{
-			return reinterpret_cast<N48*>(this)->insert(key, node);
-		}
-		case NTypes::N256:{
-			return reinterpret_cast<N256*>(this)->insert(key, node);
-		}
+	case NTypes::N4: {
+		return reinterpret_cast<N4*>(this)->insert(key, node);
+	}
+	case NTypes::N16: {
+		return reinterpret_cast<N16*>(this)->insert(key, node);
+	}
+	case NTypes::N48: {
+		return reinterpret_cast<N48*>(this)->insert(key, node);
+	}
+	case NTypes::N256: {
+		return reinterpret_cast<N256*>(this)->insert(key, node);
+	}
 	}
 	return false;
 }
 
 N* N::getChild(uint8_t key, N* node){
 	switch (node->type) {
-		case NTypes::N4:{
-			return reinterpret_cast<N4*>(node)->getChild(key);
-		}
-		case NTypes::N16:{
-			return reinterpret_cast<N16*>(node)->getChild(key);
-		}
-		case NTypes::N48:{
-			return reinterpret_cast<N48*>(node)->getChild(key);
-		}
-		case NTypes::N256:{
-			return reinterpret_cast<N256*>(node)->getChild(key);
-		}
+	case NTypes::N4: {
+		return reinterpret_cast<N4*>(node)->getChild(key);
+	}
+	case NTypes::N16: {
+		return reinterpret_cast<N16*>(node)->getChild(key);
+	}
+	case NTypes::N48: {
+		return reinterpret_cast<N48*>(node)->getChild(key);
+	}
+	case NTypes::N256: {
+		return reinterpret_cast<N256*>(node)->getChild(key);
+	}
 	}
 	return nullptr;
 }
 
-void N::getChilren(N* node, uint8_t start, uint8_t end,
-	std::tuple<uint8_t, N *> children[], int &childCount){
-	childCount = 0;
-	for(uint8_t cur = start; cur < end; cur++){
+void N::getChildren(N* node, uint8_t start, uint8_t end,
+                    std::tuple<uint8_t, N *> children[]){
+	uint8_t childCount = 0;
+	for(uint8_t cur = start; cur < end; cur++) {
 		//cout << "Current key:"<<unsigned(cur)<<endl;
 		N* child = getChild(cur, node);
 		if(child  == nullptr)
 			continue;
 		children[childCount] = make_tuple(cur, child);
 		childCount++;
+	}
+	if(childCount!=node->count) {
+		cout << "Child Count mismatch"<<endl;
+		cout << "Child count:"<<unsigned(childCount)<<endl;
+		cout << "Record count:"<<unsigned(node->count)<<endl;
+		assert(false);
 	}
 }
 

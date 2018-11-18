@@ -45,11 +45,11 @@ TEST_F(NodeTest, GrowShrink){
 	N4* parent = new N4({},0);
 	N4* curNode = new N4({},0);
 	parent->insert(1, curNode);
-	N::insertNode(curNode, parent, 1, 1, children[0]);
-	N::insertNode(curNode, parent, 1, 2, children[1]);
-	N::insertNode(curNode, parent, 1, 3, children[2]);
-	N::insertNode(curNode, parent, 1, 4, children[3]);
-	N::insertNode(curNode, parent, 1, 5, children[4]);
+	N::insertOrUpdateNode(curNode, parent, 1, 1, children[0]);
+	N::insertOrUpdateNode(curNode, parent, 1, 2, children[1]);
+	N::insertOrUpdateNode(curNode, parent, 1, 3, children[2]);
+	N::insertOrUpdateNode(curNode, parent, 1, 4, children[3]);
+	N::insertOrUpdateNode(curNode, parent, 1, 5, children[4]);
 	ASSERT_EQ(parent->getChild(1)->type,  NTypes::N16);
 	// origin node has been removed
 	curNode = static_cast<N4 *>(parent->getChild(1));
