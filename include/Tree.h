@@ -7,7 +7,7 @@ class Tree{
 public:
   N* root;
   Tree();
-  void* lookup(const uint8_t *key);
+  N* lookup(uint8_t *key,int sizeKey)const;
   void insert(uint8_t *key, N* val, int keySize);
   void remove(const uint8_t *key);
   ~Tree();

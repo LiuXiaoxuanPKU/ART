@@ -9,11 +9,36 @@ Tree::~Tree(){
 	delete root;
 }
 
-// void* Tree::lookup() const {
-//
-// }
-//
-//
+N* Tree::lookup(uint8_t* key, int sizeKey) const {
+    N *node = nullptr;
+    N *nextNode = root;
+    int keyLevel = 0;
+    int nodeLevel = 0;
+    uint8_t commonPrefix[maxPrefixLen];
+
+    while(true){
+        node = nextNode;
+        if(prefixMatch(node, key, sizeKey,
+                    keyLevel, nodeLevel,
+                    commonPrefix)){
+            if(keyLevel == sizeKey){
+                return N::getValueFromLeaf(N::getChild(0,node));
+            }
+            nextNode = N::getChild(key[keyLevel],node);
+            // prefix
+            if(nextNode == nullptr)
+                return nullptr;
+            if(N::isLeaf(nextNode)){
+                return N::getValueFromLeaf(nextNode);
+            }
+        } else {
+            return nullptr;
+        }
+        keyLevel++;
+    }
+}
+
+
 
 void Tree::insert(uint8_t *key, N *val, int insertKeySize){
 	N *node = nullptr;
@@ -62,7 +87,6 @@ void Tree::insert(uint8_t *key, N *val, int insertKeySize){
 					newNode->insert(key[keyLevel+1],leaf);
 				}
 				std::tuple<uint8_t, N *> children[256];
-				cout << unsigned(key[keyLevel])<<endl;
 				N::insertOrUpdateNode(node, parentNode, parentKey,
 				                      key[keyLevel], newNode);
 				N::getChildren(node, 0, 255, children);
