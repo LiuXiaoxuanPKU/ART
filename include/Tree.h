@@ -19,7 +19,7 @@ public:
   static int getSize(uint8_t *key);
   static N* spawn(uint8_t *commonPrefix, N* node,
                   uint8_t *key, N *value, int insertKeySize,
-                  int nodeLevel, int keyLevel);
+                  int nodeLevel, int keyLevel,N* parentNode, uint8_t parentKey);
   static void addLeaf(int insertKeyLevel, int insertKeySize,
                     uint8_t* key, N* node, N* val, N* parentNode, uint8_t parentKey);
   static void skipIfEmpty(N *newNode, N *dupLeaf, uint8_t key);

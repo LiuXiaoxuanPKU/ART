@@ -33,17 +33,17 @@ void Tree::insert(uint8_t *key, N *val, int insertKeySize){
 		if(prefixMatch(node, key, insertKeySize,
 		               keyLevel, nodeLevel,
 		               commonPrefix)) {
-            // insert key == prefix
+			// insert key == prefix
 			if(node->prefix_len == insertKeySize) {
-                N::insertOrUpdateNode(node, parentNode, parentKey, 0, val);
+				N::insertOrUpdateNode(node, parentNode, parentKey, 0, val);
 			}
 			// size of remainKey is 1
 			if(keyLevel == insertKeySize - 1) {
-                N::insertOrUpdateNode(node, parentNode, parentKey, key[keyLevel], N::setLeaf(val));
-                return;
+				N::insertOrUpdateNode(node, parentNode, parentKey, key[keyLevel], N::setLeaf(val));
+				return;
 			}
-			nextNode = N::getChild(key[keyLevel], node);
 			nodeKey = key[keyLevel];
+            nextNode = N::getChild(nodeKey, node);
 			if(nextNode == nullptr) {
 				addLeaf(keyLevel, insertKeySize,
 				        key, node, val, parentNode, parentKey);
@@ -57,15 +57,15 @@ void Tree::insert(uint8_t *key, N *val, int insertKeySize){
 				} else {
 					uint8_t leafPrefix[maxPrefixLen];
 					subKey(keyLevel+2, insertKeySize, leafPrefix, key);
-                    N* leaf = new N4(leafPrefix,insertKeySize - keyLevel-2);
+					N* leaf = new N4(leafPrefix,insertKeySize - keyLevel-2);
 					leaf->insert(0,N::setLeaf(val));
 					newNode->insert(key[keyLevel+1],leaf);
 				}
-                std::tuple<uint8_t, N *> children[256];
-                cout << unsigned(key[keyLevel])<<endl;
-                N::insertOrUpdateNode(node, parentNode, parentKey,
-                                        key[keyLevel], newNode);
-                N::getChildren(node, 0, 255, children);
+				std::tuple<uint8_t, N *> children[256];
+				cout << unsigned(key[keyLevel])<<endl;
+				N::insertOrUpdateNode(node, parentNode, parentKey,
+				                      key[keyLevel], newNode);
+				N::getChildren(node, 0, 255, children);
 				return;
 			}
 			keyLevel++;
@@ -75,7 +75,7 @@ void Tree::insert(uint8_t *key, N *val, int insertKeySize){
 			// nodeLevel = size(commonPrefix)
 			auto newNode = spawn(commonPrefix, node,
 			                     key, val, insertKeySize,
-			                     nodeLevel, keyLevel);
+			                     nodeLevel, keyLevel, parentNode,parentKey);
 			// cout << "Parent Key:"<<unsigned(parentKey)<<endl;
 			// update parent node to point to new node
 			N::change(parentNode, parentKey, newNode);
@@ -86,41 +86,45 @@ void Tree::insert(uint8_t *key, N *val, int insertKeySize){
 void Tree::addLeaf(int insertKeyLevel, int insertKeySize,
                    uint8_t* key, N* node, N* val,
                    N* parentNode, uint8_t parentKey){
+    if(insertKeyLevel == insertKeySize - 1){
+        N::insertOrUpdateNode(node, parentNode, parentKey,
+                                key[insertKeyLevel],N::setLeaf(val));
+        return;
+    }
 	uint8_t prefix[maxPrefixLen];
 	subKey(insertKeyLevel+1, insertKeySize, prefix, key);
 	N* leaf = new N4(prefix,insertKeySize-insertKeyLevel-1);
 	leaf->insert(0,N::setLeaf(val));
-    N::insertOrUpdateNode(node, parentNode, parentKey,
-                            key[insertKeyLevel], leaf);
+	N::insertOrUpdateNode(node, parentNode, parentKey,
+	                      key[insertKeyLevel], leaf);
 }
 
 N* Tree::spawn(uint8_t *commonPrefix, N* node,
                uint8_t *key, N *val, int insertKeySize,
-               int nodeLevel, int keyLevel){
-	// for(int i=0; i<nodeLevel; i++)
-	// 	cout << unsigned(commonPrefix[i])<<"*";
-	// auto newNode = new N4(commonPrefix, nodeLevel);
-	// addLeaf(keyLevel, insertKeySize,key,newNode,val);
-	// N* dupLeaf = node->duplicate();
-	// uint8_t leafKey[maxPrefixLen];
-	// subKey(nodeLevel+1, node->prefix_len, leafKey, node->prefix);
-	// dupLeaf->setPrefix(leafKey, node->prefix_len - nodeLevel);
-    // dupLeaf->prefix_len = node->prefix_len - nodeLevel;
-	// newNode->insert(node->prefix[nodeLevel],dupLeaf);
-    // skipIfEmpty(newNode,dupLeaf,node->prefix[nodeLevel]);
-	// return newNode;
+               int nodeLevel, int keyLevel,  N *parentNode,uint8_t parentKey){
+
+	auto newNode = new N4(commonPrefix, nodeLevel);
+	addLeaf(keyLevel, insertKeySize,
+                key,newNode,val,
+                node, parentKey);
+	N* dupLeaf = node->duplicate();
+	uint8_t leafKey[maxPrefixLen];
+	subKey(nodeLevel+1, node->prefix_len, leafKey, node->prefix);
+	dupLeaf->setPrefix(leafKey, node->prefix_len - nodeLevel);
+	dupLeaf->prefix_len = node->prefix_len - nodeLevel;
+	newNode->insert(node->prefix[nodeLevel],dupLeaf);
+	skipIfEmpty(newNode,dupLeaf,node->prefix[nodeLevel]);
+	return newNode;
 }
 
 void Tree::skipIfEmpty(N *newNode, N *dupLeaf, uint8_t key){
-    // std::tuple<uint8_t, N *> children[256];
-    // N::getChildren(dupLeaf, 0, 255, children);
-    // if(dupLeaf->count == 1 && get<0>(children[0])==0){
-    //     cout <<"In delete"<<unsigned(key)<<endl;
-    //     newNode->insert(key, get<1>(children[0]));
-    //     cout << get<1>(children[0])<<"*"<<endl;
-    //     cout << N::getChild(key,newNode)<<endl;
-    //     delete dupLeaf;
-    // }
+	std::tuple<uint8_t, N *> children[256];
+	N::getChildren(dupLeaf, 0, 255, children);
+	if(dupLeaf->count == 1 && get<0>(children[0])==0){
+        N::insertOrUpdateNode(newNode, nullptr, 0,
+    	                      key, get<1>(children[0]));
+	    delete dupLeaf;
+	}
 }
 
 // void Tree::remove(uint8_t[] key, void *value){

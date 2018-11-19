@@ -18,7 +18,7 @@ bool N4::insert(uint8_t k, N* node){
 	while(i < count && k >= keys[i])
 		i += 1;
 	memcpy(keys + i + 1, keys + i, (count - i) * sizeof(k));
-	memcpy(children + i + 1, children + i, (count - i) * sizeof(node));
+	memcpy(children + i + 1, children + i, (count - i) * sizeof(N*));
 	keys[i] = k;
 	children[i] = node;
 	count += 1;

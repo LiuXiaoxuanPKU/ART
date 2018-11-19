@@ -4,16 +4,16 @@ using namespace std;
 
 class NodeTest : public ::testing::Test {
 protected:
-	void SetUp() override {
-		for(int i=0; i<5 ; i++)
-			children[i] = new N4({},0);
-	}
+void SetUp() override {
+	for(int i=0; i<5; i++)
+		children[i] = new N4({},0);
+}
 
-	void TearDown() override {
-		for(int i=0; i<5; i++)
-			delete children[i];
-	}
-	N* children[5];
+void TearDown() override {
+	for(int i=0; i<5; i++)
+		delete children[i];
+}
+N* children[5];
 };
 
 
@@ -63,9 +63,21 @@ TEST_F(NodeTest, GrowShrink){
 TEST_F(NodeTest, Leaf){
 	for(int i = 0; i < 5; i++)
 		ASSERT_TRUE(N::isLeaf(children[i]) == false);
-	for(int i = 0; i < 5; i++){
+	for(int i = 0; i < 5; i++) {
 		ASSERT_TRUE(N::isLeaf(N::setLeaf(children[i])) == true);
 	}
+}
+
+TEST_F(NodeTest, getChild){
+	N* root = new N4({},0);
+	N* curNode = new N4({},0);
+	root->insert(9,curNode);
+	for(uint8_t i=0; i<5; i++)
+		N::insertOrUpdateNode(curNode, root, 9, i, children[i]);
+	cout <<"---------"<<int(curNode->type)<<endl;
+	ASSERT_EQ(N::getChild(9,root)->type, NTypes::N16);
+	for(uint8_t i=0; i<5; i++)
+		ASSERT_TRUE(N::getChild(i,N::getChild(9,root))==children[i]);
 }
 
 

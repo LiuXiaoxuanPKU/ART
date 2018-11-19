@@ -46,7 +46,6 @@ void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
 	// current node is not full
 	if(n->insert(key,val))
 		return;
-
 	// initialize a bigger node
 	auto big_node = new biggerN(n->prefix, n->prefix_len);
 	// copy original keys and children
