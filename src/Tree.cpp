@@ -19,18 +19,17 @@ N* Tree::lookup(uint8_t* key, int key_size) const {
     while(true) {
         node = next_node;
         if(prefixMatch(node, key, key_size,
-            key_level, node_level,
-            common_prefix)) {
-                if(key_level == key_size) {
-                    return N::getValueFromLeaf(N::getChild(0,node));
-                }
-                next_node = N::getChild(key[key_level],node);
-                // prefix
-                if(next_node == nullptr)
-                    return nullptr;
-                if(N::isLeaf(next_node)) {
-                    return N::getValueFromLeaf(next_node);
-                }
+            key_level, node_level, common_prefix)) {
+            if(key_level == key_size) {
+                return N::getValueFromLeaf(N::getChild(0,node));
+            }
+            next_node = N::getChild(key[key_level],node);
+            // prefix
+            if(next_node == nullptr)
+                return nullptr;
+            if(N::isLeaf(next_node)) {
+                return N::getValueFromLeaf(next_node);
+            }
         } else {
             return nullptr;
         }
@@ -123,7 +122,7 @@ N* Tree::spawn(uint8_t *common_prefix, N* node,
 
     auto node_new = new N4(common_prefix, node_level);
     addLeaf(key_level, insertkey_size,
-            key,node_new,val,
+            key, node_new, val,
             node, parent_key);
     N* leaf_dup = node->duplicate();
     uint8_t leaf_key[maxPrefixLen];
@@ -131,7 +130,7 @@ N* Tree::spawn(uint8_t *common_prefix, N* node,
     leaf_dup->setPrefix(leaf_key, node->prefix_len - node_level);
     leaf_dup->prefix_len = node->prefix_len - node_level;
     node_new->insert(node->prefix[node_level],leaf_dup);
-    skipIfEmpty(node_new,leaf_dup,node->prefix[node_level]);
+    skipIfEmpty(node_new, leaf_dup, node->prefix[node_level]);
     return node_new;
 }
 
