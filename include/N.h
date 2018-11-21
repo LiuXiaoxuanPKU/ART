@@ -13,7 +13,9 @@
 #include <stdint.h>    // integer types
 #include <tuple> // tuple for getChildren
 
-static const unsigned maxPrefixLen = 9;
+#include <iostream>
+
+static const unsigned maxPrefixLen = 50;
 enum class NTypes: uint8_t{
     N4 = 0,
     N16 = 1,
@@ -94,11 +96,13 @@ public:
 
 class N48:public N{
 public:
+    const uint8_t empty_marker = 48;
     uint8_t child_index[256];
     N* children[48] = {nullptr};
-    static const uint8_t empty_marker = 48;
 
-    N48(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N48, prefix, prefix_len){};
+    N48(const uint8_t* prefix, uint32_t prefix_len):N(NTypes::N48, prefix, prefix_len){
+        std::fill_n(child_index, 256, empty_marker);
+    };
     bool insert(uint8_t key, N*n);
     bool remove(uint8_t key);
     void change(uint8_t key, N*val);

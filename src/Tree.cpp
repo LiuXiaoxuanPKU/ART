@@ -79,9 +79,9 @@ void Tree::insert(uint8_t *key, N *val, int insertkey_size){
                 if(key_level == insertkey_size - 2) {
                     node_new->insert(key[key_level+1], N::setLeaf(val));
                 } else {
-                    uint8_t leafPrefix[maxPrefixLen];
-                    subKey(key_level+2, insertkey_size, leafPrefix, key);
-                    N* leaf = new N4(leafPrefix,insertkey_size - key_level-2);
+                    uint8_t leaf_prefix[maxPrefixLen];
+                    subKey(key_level+2, insertkey_size, leaf_prefix, key);
+                    N* leaf = new N4(leaf_prefix,insertkey_size - key_level-2);
                     leaf->insert(0,N::setLeaf(val));
                     node_new->insert(key[key_level+1],leaf);
                 }
@@ -127,8 +127,8 @@ N* Tree::spawn(uint8_t *common_prefix, N* node,
     N* leaf_dup = node->duplicate();
     uint8_t leaf_key[maxPrefixLen];
     subKey(node_level+1, node->prefix_len, leaf_key, node->prefix);
-    leaf_dup->setPrefix(leaf_key, node->prefix_len - node_level);
-    leaf_dup->prefix_len = node->prefix_len - node_level;
+    leaf_dup->setPrefix(leaf_key, node->prefix_len - node_level - 1);
+    leaf_dup->prefix_len = node->prefix_len - node_level - 1;
     node_new->insert(node->prefix[node_level],leaf_dup);
     skipIfEmpty(node_new, leaf_dup, node->prefix[node_level]);
     return node_new;
@@ -138,7 +138,7 @@ void Tree::skipIfEmpty(N *node_new, N *leaf_dup, uint8_t key){
     // TODO: remove std
     std::tuple<uint8_t, N *> children[256];
     N::getChildren(leaf_dup, 0, 255, children);
-    if(leaf_dup->count == 1 && get<0>(children[0])==0) {
+    if(leaf_dup->prefix_len == 0 && leaf_dup->count == 1 && get<0>(children[0])==0) {
         N::insertOrUpdateNode(node_new, nullptr, 0,
                         key, get<1>(children[0]));
         delete leaf_dup;

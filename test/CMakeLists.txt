@@ -12,3 +12,4 @@ endfunction()
 
 add_unit_test(NodeTest)
 add_unit_test(TreeTest)
+add_unit_test(WordTest)

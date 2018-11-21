@@ -237,10 +237,10 @@ void N::getChildren(N* node, uint8_t start, uint8_t end,
         child_cnt++;
     }
     if(child_cnt!=node->count) {
-    cout << "Child Count mismatch"<<endl;
-    cout << "Child count:"<<unsigned(child_cnt)<<endl;
-    cout << "Record count:"<<unsigned(node->count)<<endl;
-    assert(false);
+        cout << "Child Count mismatch"<<endl;
+        cout << "Child count:"<<unsigned(child_cnt)<<endl;
+        cout << "Record count:"<<unsigned(node->count)<<endl;
+        assert(false);
     }
 }
 
