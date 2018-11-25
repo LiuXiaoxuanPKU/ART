@@ -31,15 +31,16 @@ protected:
         while(l.size()>0) {
             N* curNode = l.front();
             l.pop();
-            std::tuple<uint8_t, N *> children[256];
+            uint8_t children_key[256];
+            N* children_p[256];
             //cout<<"("<<cnt<<")"<<endl;
-            N::getChildren(curNode, 0, 255, children);
+            N::getChildren(curNode, 0, 255, children_key, children_p);
             for(unsigned int i=0; i < curNode->count; i++) {
-                N* curChild = get<1>(children[i]);
+                N* curChild = children_p[i];
                 int start_id = -1;
                 start_id = visit.find(curNode)->second;
                 int end_id = -1;
-                uint8_t curKey = get<0>(children[i]);
+                uint8_t curKey = children_key[i];
                 if(N::isLeaf(curChild)) {
                     out << "\t";
                     int end_val = reinterpret_cast<uint64_t>(N::getValueFromLeaf(curChild));
@@ -183,6 +184,27 @@ TEST_F(TreeTest, pointLookup){
     delete test;
 }
 
+TEST_F(TreeTest, remove){
+    Tree* test = buildTree();
+    uint8_t key1[] = {1};
+    uint8_t key2[] = {1,4,5};
+    uint8_t key3[] = {1,4,5,7,8,7,7,7};
+    uint8_t key4[] = {1,4,5,7,8,9};
+    uint8_t key5[] = {2};
+    uint8_t key6[] = {2,3,4,5,6};
+    uint8_t key7[] = {2,3,4,5,7};
+    uint8_t key8[] = {2,5};
+    visTree(test, "org.gv");
+    test->remove(key1, 1);
+    visTree(test, "d1.gv");
+    test->remove(key2, 3);
+    visTree(test, "d2.gv");
+    test->remove(key3, 8);
+    visTree(test, "d3.gv");
+    // test->remove(key4, 6);
+    // visTree(test, "d4.gv");
+    delete test;
+}
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);

@@ -3,13 +3,16 @@
 
 #include "N.h"
 
+static const unsigned maxResultLen = 100;
+
 class Tree{
 public:
     N* root;
     Tree();
     N* lookup(uint8_t *key,int sizeKey)const;
+    bool rangeLookup(uint8_t *start_key, uint8_t *end_key, N *result);
     void insert(uint8_t *key, N* val, int keySize);
-    void remove(const uint8_t *key);
+    bool remove(uint8_t *key, int deletekey_size);
     ~Tree();
 
     static void subKey(int start, int end, uint8_t *subKey, uint8_t *org);

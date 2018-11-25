@@ -37,6 +37,24 @@ N* Tree::lookup(uint8_t* key, int key_size) const {
     }
 }
 
+bool Tree::rangeLookup(uint8_t *start_key, uint8_t *end_key, N *result){
+    // // BFS for range query
+    // int key_level = 0;
+    // N *node = nullptr;
+    // N *next_node = root;
+    // N *l[maxResultLen];
+    // l[0] = root;
+    // int cnt = 1;
+    // int head = 0;
+    // int tail = 1;
+    // while(true){
+    //     N *top = l[head];
+    //     head++;
+    //     for()
+    //     key_level++;
+    // }
+    return true;
+}
 
 
 void Tree::insert(uint8_t *key, N *val, int insertkey_size){
@@ -136,54 +154,60 @@ N* Tree::spawn(uint8_t *common_prefix, N* node,
 
 void Tree::skipIfEmpty(N *node_new, N *leaf_dup, uint8_t key){
     // TODO: remove std
-    std::tuple<uint8_t, N *> children[256];
-    N::getChildren(leaf_dup, 0, 255, children);
-    if(leaf_dup->prefix_len == 0 && leaf_dup->count == 1 && get<0>(children[0])==0) {
+    uint8_t children_key[256];
+    N* children_p[256];
+    N::getChildren(leaf_dup, 0, 255, children_key, children_p);
+    if(leaf_dup->prefix_len == 0 && leaf_dup->count == 1 && children_key[0]==0) {
         N::insertOrUpdateNode(node_new, nullptr, 0,
-                        key, get<1>(children[0]));
+                        key, children_p[0]);
         delete leaf_dup;
     }
 }
 
-// void Tree::remove(uint8_t[] key, void *value){
-//  N *node = nullptr;
-//  N *nextNode = root;
-//  N *parentNode = nullptr;
-//  uint8_t parentKey, nodeKey = 0;
-//  int level = 0;
-//
-//  while(true) {
-//      parentNode = node;
-//      parentKey = nodeKey;
-//      node = nextNode;
-//
-//      if(prefixMatch(node, key, nextLevel, commonPrefix, remainPrefix)) {
-//          nodeKey = key[level];
-//          nextNode = N::getChild(nodeKey, node);
-//          if (nextNode == nullptr) {
-//              return;
-//          }
-//          if (N::isLeaf(nextNode)) {
-//              // the value of leaf != val
-//              if()
-//                  return;
-//              // the value of leaf == val
-//              if(node->count == 1 && node != root) {
-//
-//              } else {
-//                  N::removeNode(node, key[level], parentNode, parentKey);
-//              }
-//          }
-//
-//      } else {
-//          // no match, just return
-//          return;
-//      }
-//      level++;
-//  }
-// }
-//
-//
+bool Tree::remove(uint8_t* key, int deletekey_size){
+    // N *node = nullptr;
+    // N *next_node = root;
+    // N *parent_node = nullptr;
+    // uint8_t parent_key, node_key = 0;
+    // int key_level = 0;
+    // int node_level = 0;
+    //
+    // while(true) {
+    //     parent_node = node;
+    //     parent_key = node_key;
+    //     node = next_node;
+    //     uint8_t common_prefix[maxPrefixLen];
+    //     if(prefixMatch(node, key, deletekey_size,
+    //                     key_level, node_level,
+    //                     common_prefix)) {
+    //         if(key_level == deletekey_size)
+    //             node_key = 0;
+    //         else
+    //             node_key = key[key_level];
+    //         next_node = N::getChild(node_key, node);
+    //         if (next_node == nullptr) {
+    //             return false;
+    //         }
+    //         if (N::isLeaf(next_node) &&
+    //                 (key_level == deletekey_size - 1 || key_level == deletekey_size)) {
+    //             N::removeNode(node, parent_node, parent_key, node_key);
+    //             if(node->count == 1){
+    //                 node->getFirstChild();
+    //                 child->setPrefix();
+    //                 parent_node->insert(parent_key, child);
+    //                 delete node;
+    //             }
+    //             return true;
+    //         }
+    //     } else {
+    //         // no match, just return
+    //         return false;
+    //     }
+    //     key_level++;
+    // }
+}
+
+
 bool Tree::prefixMatch(N *node,uint8_t *key, int key_size,
                        int &key_level, int &node_level,
                        uint8_t *common_prefix){

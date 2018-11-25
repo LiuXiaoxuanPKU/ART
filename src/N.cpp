@@ -61,8 +61,9 @@ void N::insertGrow(curN *n, uint8_t key, N *val, uint8_t key_par, N *node_par){
 
 template<class curN, class smallerN>
 void N::removeAndShrink(curN *n, uint8_t key, uint8_t key_par, N *parent_node){
-    if(n->remove(key))
+    if(n->remove(key)){
         return;
+    }
     // initialize a smaller node
     auto nSmall = new smallerN(n->prefix, n->prefix_len);
     // remove key
@@ -136,7 +137,8 @@ void N::removeNode(N *node, N *parent_node, uint8_t key_par, uint8_t key){
     switch (node->type) {
         case NTypes::N4: {
             auto n = static_cast<N4 *>(node);
-            n->remove(key);
+            removeAndShrink<N4, N4>(n, key, key_par, parent_node);
+            //n->remove(key);
             return;
         }
         case NTypes::N16: {
@@ -225,15 +227,34 @@ N* N::getChild(uint8_t key, N* node){
     return nullptr;
 }
 
+bool N::remove(uint8_t key){
+    switch (this->type) {
+        case NTypes::N4: {
+            return reinterpret_cast<N4*>(this)->remove(key);
+        }
+        case NTypes::N16: {
+            return reinterpret_cast<N16*>(this)->remove(key);
+        }
+        case NTypes::N48: {
+            return reinterpret_cast<N48*>(this)->remove(key);
+        }
+        case NTypes::N256: {
+            return reinterpret_cast<N256*>(this)->remove(key);
+        }
+    }
+    return false;
+}
+
 void N::getChildren(N* node, uint8_t start, uint8_t end,
-                    std::tuple<uint8_t, N *> children[]){
+                    uint8_t *children_key, N**children_p){
     uint8_t child_cnt = 0;
     for(uint8_t cur = start; cur < end; cur++) {
     //cout << "Current key:"<<unsigned(cur)<<endl;
         N* child = getChild(cur, node);
         if(child  == nullptr)
             continue;
-        children[child_cnt] = make_tuple(cur, child);
+        children_key[child_cnt] = cur;
+        children_p[child_cnt] = child;
         child_cnt++;
     }
     if(child_cnt!=node->count) {

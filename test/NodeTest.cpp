@@ -74,7 +74,6 @@ TEST_F(NodeTest, getChild){
     root->insert(9,curNode);
     for(uint8_t i=0; i<5; i++)
     N::insertOrUpdateNode(curNode, root, 9, i, children[i]);
-    cout <<"---------"<<int(curNode->type)<<endl;
     ASSERT_EQ(N::getChild(9,root)->type, NTypes::N16);
     for(uint8_t i=0; i<5; i++)
     ASSERT_TRUE(N::getChild(i,N::getChild(9,root))==children[i]);

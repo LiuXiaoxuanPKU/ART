@@ -46,6 +46,7 @@ public:
     void setPrefix(const uint8_t *prefix, int length);
     N* duplicate();
     bool insert(uint8_t key, N*node);
+    bool remove(uint8_t key);
 
     template<class curN, class biggerN>
     static void insertGrow(curN* n, uint8_t k, N* node, uint8_t key_par, N* parent);
@@ -62,7 +63,7 @@ public:
     static bool isLeaf(N* node);
     static N* getChild(uint8_t key, N* node);
     static void getChildren(N* node, uint8_t start, uint8_t end,
-    	std::tuple<uint8_t, N *> children[]);
+        uint8_t* children_key, N** children_p);
 };
 
 class N4:public N{
