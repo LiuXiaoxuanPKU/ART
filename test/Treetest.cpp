@@ -34,7 +34,8 @@ protected:
             uint8_t children_key[256];
             N* children_p[256];
             //cout<<"("<<cnt<<")"<<endl;
-            N::getChildren(curNode, 0, 255, children_key, children_p);
+            int child_cnt = 0;
+            N::getChildren(curNode, 0, 255, children_key, children_p,child_cnt);
             for(unsigned int i=0; i < curNode->count; i++) {
                 N* curChild = children_p[i];
                 int start_id = -1;
@@ -185,25 +186,91 @@ TEST_F(TreeTest, pointLookup){
 }
 
 TEST_F(TreeTest, remove){
+    // Tree* test = buildTree();
+    // uint8_t key1[] = {1};
+    // uint8_t key2[] = {1,4,5};
+    // uint8_t key3[] = {1,4,5,7,8,7,7,7};
+    // uint8_t key4[] = {1,4,5,7,8,9};
+    // uint8_t key5[] = {2};
+    // uint8_t key6[] = {2,3,4,5,6};
+    // uint8_t key7[] = {2,3,4,5,7};
+    // uint8_t key8[] = {2,5};
+    // visTree(test, "org.gv");
+    // test->remove(key1, 1);
+    // visTree(test, "d1.gv");
+    // test->remove(key2, 3);
+    // visTree(test, "d2.gv");
+    // test->remove(key3, 8);
+    // visTree(test, "d3.gv");
+    // // test->remove(key4, 6);
+    // // visTree(test, "d4.gv");
+    // delete test;
+}
+
+TEST_F(TreeTest, rangeLookupHelper){
     Tree* test = buildTree();
-    uint8_t key1[] = {1};
-    uint8_t key2[] = {1,4,5};
-    uint8_t key3[] = {1,4,5,7,8,7,7,7};
-    uint8_t key4[] = {1,4,5,7,8,9};
-    uint8_t key5[] = {2};
-    uint8_t key6[] = {2,3,4,5,6};
-    uint8_t key7[] = {2,3,4,5,7};
-    uint8_t key8[] = {2,5};
+    N* result[maxResultLen];
+    int result_cnt = 0;
+
+    uint8_t start_key[] = {2,3,4,5,7};
+    uint8_t end_key[] = {2,3,4,5,7};
+    test->rangeLookupHelper(test->root, 0, 5,start_key, end_key,
+                            result, result_cnt,
+                            true, true);
+    ASSERT_EQ(result_cnt, 1);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(23457));
+
+    uint8_t start_key2[] = {1,4,5,1,0,0};
+    uint8_t end_key2[] = {1,4,5,7,8,9};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookupHelper(test->root,0,6,start_key2, end_key2, result, result_cnt,true,true);
+    ASSERT_EQ(result_cnt, 2);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(14578777));
+
+    uint8_t start_key3[] = {2,3,4,5,6};
+    uint8_t end_key3[] = {2,3,9,7,8};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookupHelper(test->root,0,5,start_key3, end_key3, result, result_cnt,true,true);
+    ASSERT_EQ(result_cnt, 5);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(23456));
+}
+
+TEST_F(TreeTest, rangeLookup){
+    Tree* test = buildTree();
     visTree(test, "org.gv");
-    test->remove(key1, 1);
-    visTree(test, "d1.gv");
-    test->remove(key2, 3);
-    visTree(test, "d2.gv");
-    test->remove(key3, 8);
-    visTree(test, "d3.gv");
-    // test->remove(key4, 6);
-    // visTree(test, "d4.gv");
-    delete test;
+    uint8_t start_key[] = {2,3,4,5,7};
+    uint8_t end_key[] = {2,3,4,5,7};
+    N* result[maxResultLen];
+    int result_cnt = 0;
+    test->rangeLookup(start_key, end_key, 5,result, result_cnt);
+    ASSERT_EQ(result_cnt, 1);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(23457));
+
+    uint8_t start_key2[] = {1,4,5,1,0};
+    uint8_t end_key2[] = {1,4,5,7,9};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookup(start_key2, end_key2,5,result, result_cnt);
+    ASSERT_EQ(result_cnt, 2);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(14578777));
+
+    uint8_t start_key3[] = {1,4,5,7,8,7,7,7};
+    uint8_t end_key3[] = {1,4,5,7,8,7,7,7};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookup(start_key3, end_key3, 8,result, result_cnt);
+    ASSERT_EQ(result_cnt, 1);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(14578777));
+
+    uint8_t start_key4[] = {1,3};
+    uint8_t end_key4[] = {2,4};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookup(start_key4, end_key4, 2,result, result_cnt);
+    ASSERT_EQ(result_cnt, 9);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(145));
 }
 
 int main(int argc, char** argv) {

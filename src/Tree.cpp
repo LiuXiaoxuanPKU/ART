@@ -37,23 +37,81 @@ N* Tree::lookup(uint8_t* key, int key_size) const {
     }
 }
 
-bool Tree::rangeLookup(uint8_t *start_key, uint8_t *end_key, N *result){
-    // // BFS for range query
-    // int key_level = 0;
-    // N *node = nullptr;
-    // N *next_node = root;
-    // N *l[maxResultLen];
-    // l[0] = root;
-    // int cnt = 1;
-    // int head = 0;
-    // int tail = 1;
-    // while(true){
-    //     N *top = l[head];
-    //     head++;
-    //     for()
-    //     key_level++;
-    // }
-    return true;
+void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
+                        uint8_t *start_key, uint8_t *end_key,
+                        N **result,int &result_cnt,
+                        bool is_start, bool is_end){
+    //cout << "In range:"<<key_level<<" "<<is_start<<" "<<is_end<<" "<<node->prefix_len<<endl;
+    uint8_t cur_start = 0;
+    uint8_t cur_end = 255;
+    int start_level = key_level;
+    int end_level = key_level;
+    if (is_start) {
+        int i = 0;
+        for(;i<node->prefix_len;i++){
+            if(start_level < key_size && node->prefix[i]==start_key[start_level])
+                start_level++;
+            else if (start_level < key_size && node->prefix[i] < start_key[start_level])
+                return;
+            else {
+                is_start = false;
+                cur_start = 0;
+                break;
+            }
+        }
+        if(i == node->prefix_len)
+            cur_start = start_key[start_level];
+    }
+    if (is_end) {
+        int i = 0;
+        for(;i<node->prefix_len;i++){
+            if(end_level < key_size && node->prefix[i]==end_key[end_level])
+                end_level++;
+            else if (end_level < key_size &&node->prefix[i] > end_key[end_level])
+                return;
+            else {
+                //cout << "prefix:"<<unsigned(node->prefix[i])<<" "<<unsigned(end_key[end_level])<<endl;
+                is_end = false;
+                cur_end = 255;
+                break;
+            }
+        }
+        //cout << i << "()"<<end_level<<" "<<unsigned(end_key[end_level])<<endl;
+        if(i == node->prefix_len)
+            cur_end = end_key[end_level];
+    }
+    key_level = (start_level>end_level)?start_level:end_level;
+    if (is_start == false && is_end == false){
+        key_level += node->prefix_len;
+    }
+
+    uint8_t children_key[256];
+    N* children_p[256];
+    int child_cnt = 0;
+    cur_end = (cur_end==255)?255:cur_end+1;
+    N::getChildren(node, cur_start, cur_end,
+                children_key, children_p, child_cnt);
+    //cout << unsigned(cur_start) << " "<< unsigned(cur_end)<<"*"<<endl;
+    //cout << node->prefix_len << " " << child_cnt << endl;
+    key_level++;
+    for(int i=0;i<child_cnt;i++){
+        if(N::isLeaf(children_p[i])){
+            result[result_cnt++] = N::getValueFromLeaf(children_p[i]);
+            //cout << "Get result:" << reinterpret_cast<uint64_t>(N::getValueFromLeaf(children_p[i]))<<endl;
+            continue;
+        }
+        bool start = (is_start==true && i==0)?true:false;
+        //cout << "i:"<<i<<endl;
+        bool end = (is_end==true && i==child_cnt-1)?true:false;
+        rangeLookupHelper(children_p[i],key_level, key_size,
+                          start_key, end_key,
+                          result,result_cnt,start,end);
+    }
+}
+
+void Tree::rangeLookup(uint8_t *start_key, uint8_t *end_key, int key_size,
+                       N **result, int &result_cnt){
+    rangeLookupHelper(root, 0, key_size, start_key, end_key,result,result_cnt,true,true);
 }
 
 
@@ -156,7 +214,8 @@ void Tree::skipIfEmpty(N *node_new, N *leaf_dup, uint8_t key){
     // TODO: remove std
     uint8_t children_key[256];
     N* children_p[256];
-    N::getChildren(leaf_dup, 0, 255, children_key, children_p);
+    int child_cnt = 0;
+    N::getChildren(leaf_dup, 0, 255, children_key, children_p,child_cnt);
     if(leaf_dup->prefix_len == 0 && leaf_dup->count == 1 && children_key[0]==0) {
         N::insertOrUpdateNode(node_new, nullptr, 0,
                         key, children_p[0]);
@@ -205,6 +264,7 @@ bool Tree::remove(uint8_t* key, int deletekey_size){
     //     }
     //     key_level++;
     // }
+    return true;
 }
 
 

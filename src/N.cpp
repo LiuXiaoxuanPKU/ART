@@ -246,10 +246,10 @@ bool N::remove(uint8_t key){
 }
 
 void N::getChildren(N* node, uint8_t start, uint8_t end,
-                    uint8_t *children_key, N**children_p){
-    uint8_t child_cnt = 0;
+                    uint8_t *children_key, N**children_p, int& child_cnt){
+    child_cnt = 0;
     for(uint8_t cur = start; cur < end; cur++) {
-    //cout << "Current key:"<<unsigned(cur)<<endl;
+        //cout << "Current key:"<<unsigned(cur)<<endl;
         N* child = getChild(cur, node);
         if(child  == nullptr)
             continue;
@@ -257,7 +257,7 @@ void N::getChildren(N* node, uint8_t start, uint8_t end,
         children_p[child_cnt] = child;
         child_cnt++;
     }
-    if(child_cnt!=node->count) {
+    if(start==0 && end==255 && child_cnt!=node->count) {
         cout << "Child Count mismatch"<<endl;
         cout << "Child count:"<<unsigned(child_cnt)<<endl;
         cout << "Record count:"<<unsigned(node->count)<<endl;

@@ -10,7 +10,12 @@ public:
     N* root;
     Tree();
     N* lookup(uint8_t *key,int sizeKey)const;
-    bool rangeLookup(uint8_t *start_key, uint8_t *end_key, N *result);
+    void rangeLookup(uint8_t *start_key, uint8_t *end_key, int key_size,
+                    N **result, int &result_cnt);
+    void rangeLookupHelper(N* node, int  key_level, int key_size,
+                            uint8_t *start_key, uint8_t *end_key,
+                            N **result,int &result_cnt,
+                            bool is_start, bool is_end);
     void insert(uint8_t *key, N* val, int keySize);
     bool remove(uint8_t *key, int deletekey_size);
     ~Tree();

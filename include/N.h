@@ -63,7 +63,7 @@ public:
     static bool isLeaf(N* node);
     static N* getChild(uint8_t key, N* node);
     static void getChildren(N* node, uint8_t start, uint8_t end,
-        uint8_t* children_key, N** children_p);
+        uint8_t* children_key, N** children_p, int& cnt);
 };
 
 class N4:public N{
