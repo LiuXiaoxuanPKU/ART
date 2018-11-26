@@ -36,7 +36,7 @@ N* Tree::lookup(uint8_t* key, int key_size) const {
         key_level++;
     }
 }
-
+// DFS to do the range lookup
 void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
                         uint8_t *start_key, uint8_t *end_key,
                         N **result,int &result_cnt,
@@ -109,8 +109,14 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
     }
 }
 
-void Tree::rangeLookup(uint8_t *start_key, uint8_t *end_key, int key_size,
+void Tree::rangeLookup(uint8_t *start_key, uint8_t *end_key,
+                       int start_size, int end_size,
                        N **result, int &result_cnt){
+    int key_size = (start_size>end_size)?start_size:end_size;
+    for(int i=start_size;i<key_size;i++)
+        start_key[i] = 0;
+    for(int i=end_size;i<key_size;i++)
+        end_key[i] = 0;
     rangeLookupHelper(root, 0, key_size, start_key, end_key,result,result_cnt,true,true);
 }
 

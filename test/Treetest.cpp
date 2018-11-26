@@ -240,37 +240,37 @@ TEST_F(TreeTest, rangeLookupHelper){
 TEST_F(TreeTest, rangeLookup){
     Tree* test = buildTree();
     visTree(test, "org.gv");
-    uint8_t start_key[] = {2,3,4,5,7};
+    uint8_t start_key[] = {2,3,4,5};
     uint8_t end_key[] = {2,3,4,5,7};
     N* result[maxResultLen];
     int result_cnt = 0;
-    test->rangeLookup(start_key, end_key, 5,result, result_cnt);
-    ASSERT_EQ(result_cnt, 1);
-    ASSERT_EQ(result[0], reinterpret_cast<N*>(23457));
+    test->rangeLookup(start_key, end_key, 4,5,result, result_cnt);
+    ASSERT_EQ(result_cnt, 2);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(23456));
 
-    uint8_t start_key2[] = {1,4,5,1,0};
+    uint8_t start_key2[] = {1,4,5,1};
     uint8_t end_key2[] = {1,4,5,7,9};
     memset(result,0,sizeof(N*)*maxResultLen);
     result_cnt = 0;
-    test->rangeLookup(start_key2, end_key2,5,result, result_cnt);
+    test->rangeLookup(start_key2, end_key2,4,5,result, result_cnt);
     ASSERT_EQ(result_cnt, 2);
     ASSERT_EQ(result[0], reinterpret_cast<N*>(14578777));
 
-    uint8_t start_key3[] = {1,4,5,7,8,7,7,7};
+    uint8_t start_key3[] = {1,4,5,7,8,7,7,6};
     uint8_t end_key3[] = {1,4,5,7,8,7,7,7};
     memset(result,0,sizeof(N*)*maxResultLen);
     result_cnt = 0;
-    test->rangeLookup(start_key3, end_key3, 8,result, result_cnt);
+    test->rangeLookup(start_key3, end_key3, 8,8,result, result_cnt);
     ASSERT_EQ(result_cnt, 1);
     ASSERT_EQ(result[0], reinterpret_cast<N*>(14578777));
 
-    uint8_t start_key4[] = {1,3};
+    uint8_t start_key4[] = {1};
     uint8_t end_key4[] = {2,4};
     memset(result,0,sizeof(N*)*maxResultLen);
     result_cnt = 0;
-    test->rangeLookup(start_key4, end_key4, 2,result, result_cnt);
-    ASSERT_EQ(result_cnt, 9);
-    ASSERT_EQ(result[0], reinterpret_cast<N*>(145));
+    test->rangeLookup(start_key4, end_key4, 1,2,result, result_cnt);
+    ASSERT_EQ(result_cnt, 10);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(123));
 }
 
 int main(int argc, char** argv) {

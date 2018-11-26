@@ -3,14 +3,15 @@
 
 #include "N.h"
 
-static const unsigned maxResultLen = 100;
+static const unsigned maxResultLen = 1000;
 
 class Tree{
 public:
     N* root;
     Tree();
     N* lookup(uint8_t *key,int sizeKey)const;
-    void rangeLookup(uint8_t *start_key, uint8_t *end_key, int key_size,
+    void rangeLookup(uint8_t *start_key, uint8_t *end_key,
+                    int start_size, int end_size,
                     N **result, int &result_cnt);
     void rangeLookupHelper(N* node, int  key_level, int key_size,
                             uint8_t *start_key, uint8_t *end_key,
