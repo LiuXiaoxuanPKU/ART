@@ -41,11 +41,16 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
                         uint8_t *start_key, uint8_t *end_key,
                         N **result,int &result_cnt,
                         bool is_start, bool is_end){
-    //cout << "In range:"<<key_level<<" "<<is_start<<" "<<is_end<<" "<<node->prefix_len<<endl;
+     //cout << "In range:"<<unsigned(start_key[key_level])<<" "<<is_end<<endl;
+     //cout << "*" << unsigned(end_key[key_level]) << endl;
+    //     <<is_start<<" "<<key_size<<" "<<unsigned(key_level)<<endl;
     uint8_t cur_start = 0;
     uint8_t cur_end = 255;
     int start_level = key_level;
     int end_level = key_level;
+    if (is_start == false && is_end == false){
+        key_level += node->prefix_len;
+    }
     if (is_start) {
         int i = 0;
         for(;i<node->prefix_len;i++){
@@ -53,13 +58,16 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
                 start_level++;
             else if (start_level < key_size && node->prefix[i] < start_key[start_level])
                 return;
-            else {
+            else if (start_level == key_size || node->prefix[i] > start_key[start_level]){
                 is_start = false;
                 cur_start = 0;
                 break;
             }
         }
-        if(i == node->prefix_len)
+        if (start_level == key_size){
+            is_start = false;
+            cur_start = 0;
+        } else if(i == node->prefix_len)
             cur_start = start_key[start_level];
     }
     if (is_end) {
@@ -69,7 +77,7 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
                 end_level++;
             else if (end_level < key_size &&node->prefix[i] > end_key[end_level])
                 return;
-            else {
+            else if (end_level < key_size &&node->prefix[i] < end_key[end_level]){
                 //cout << "prefix:"<<unsigned(node->prefix[i])<<" "<<unsigned(end_key[end_level])<<endl;
                 is_end = false;
                 cur_end = 255;
@@ -77,20 +85,22 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
             }
         }
         //cout << i << "()"<<end_level<<" "<<unsigned(end_key[end_level])<<endl;
-        if(i == node->prefix_len)
+        if (end_level == key_size){
+            is_end = false;
+            cur_end = 0;
+        } else if(i == node->prefix_len)
             cur_end = end_key[end_level];
     }
-    key_level = (start_level>end_level)?start_level:end_level;
-    if (is_start == false && is_end == false){
-        key_level += node->prefix_len;
-    }
+    key_level = max(start_level,end_level);
 
     uint8_t children_key[256];
     N* children_p[256];
     int child_cnt = 0;
+
     cur_end = (cur_end==255)?255:cur_end+1;
     N::getChildren(node, cur_start, cur_end,
                 children_key, children_p, child_cnt);
+
     //cout << unsigned(cur_start) << " "<< unsigned(cur_end)<<"*"<<endl;
     //cout << node->prefix_len << " " << child_cnt << endl;
     key_level++;
@@ -102,7 +112,7 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
         }
         bool start = (is_start==true && i==0)?true:false;
         //cout << "i:"<<i<<endl;
-        bool end = (is_end==true && i==child_cnt-1)?true:false;
+        bool end = (is_end==true && i==child_cnt-1 && children_key[i]==end_key[key_level-1])?true:false;
         rangeLookupHelper(children_p[i],key_level, key_size,
                           start_key, end_key,
                           result,result_cnt,start,end);
@@ -112,12 +122,26 @@ void Tree::rangeLookupHelper(N* node, int  key_level, int key_size,
 void Tree::rangeLookup(uint8_t *start_key, uint8_t *end_key,
                        int start_size, int end_size,
                        N **result, int &result_cnt){
-    int key_size = (start_size>end_size)?start_size:end_size;
-    for(int i=start_size;i<key_size;i++)
-        start_key[i] = 0;
-    for(int i=end_size;i<key_size;i++)
-        end_key[i] = 0;
-    rangeLookupHelper(root, 0, key_size, start_key, end_key,result,result_cnt,true,true);
+    if(start_size<end_size){
+        uint8_t new_start_key[end_size];
+        for(int i=0;i<start_size;i++)
+            new_start_key[i] = start_key[i];
+        for(int i=start_size;i<end_size;i++)
+            new_start_key[i] = 0;
+        rangeLookupHelper(root, 0, end_size, new_start_key, end_key,
+            result,result_cnt,true,true);
+    } else if (end_size<start_size){
+        uint8_t new_end_key[start_size];
+        for(int i=0;i<end_size;i++)
+            new_end_key[i] = end_key[i];
+        for(int i=end_size;i<start_size;i++)
+            new_end_key[i] = 0;
+        rangeLookupHelper(root, 0, start_size, start_key, new_end_key,
+            result,result_cnt,true,true);
+    } else {
+        rangeLookupHelper(root, 0, start_size, start_key, end_key,
+            result,result_cnt,true,true);
+    }
 }
 
 

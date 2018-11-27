@@ -271,6 +271,22 @@ TEST_F(TreeTest, rangeLookup){
     test->rangeLookup(start_key4, end_key4, 1,2,result, result_cnt);
     ASSERT_EQ(result_cnt, 10);
     ASSERT_EQ(result[0], reinterpret_cast<N*>(123));
+
+    uint8_t start_key5[] = {1,4,5,7,8};
+    uint8_t end_key5[] = {1,4,6};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookup(start_key5, end_key5, 5,3,result, result_cnt);
+    ASSERT_EQ(result_cnt, 2);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(14578777));
+
+    uint8_t start_key6[] = {2};
+    uint8_t end_key6[] = {2,3};
+    memset(result,0,sizeof(N*)*maxResultLen);
+    result_cnt = 0;
+    test->rangeLookup(start_key6, end_key6, 1,2,result, result_cnt);
+    ASSERT_EQ(result_cnt, 1);
+    ASSERT_EQ(result[0], reinterpret_cast<N*>(2));
 }
 
 int main(int argc, char** argv) {
